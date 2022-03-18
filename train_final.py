@@ -70,15 +70,10 @@ def main():
             res_net = torchvision.models.resnet18(pretrained=True)
             res_net.cuda()
             freeze_plane2(res_net)
-            # new_gen = torch.nn.functional.interpolate(generated, size = (328, 328), mode='bilinear')
-            # new_gen = torch.nn.functional.interpolate(generated, scale_factor = 2, mode='bilinear')
-            # new_gt = torch.nn.functional.interpolate(data['image'], scale_factor = 2, mode='nearest')
-            # new_gt = torch.nn.functional.interpolate(data['gt_img'], size = (328, 328), mode='bilinear')
             new_gen = generated.cuda()
             new_gt = data['gt_img'].cuda()
             gen_fearture = res_net(new_gen)
             gt_fearture = res_net(new_gt)
-
 
             loss_feature_alignment = opt_loss(gen_fearture, gt_fearture)
             print("epoch:%d,i:%d,loss_feature_alignment:%f" % (epoch, i, loss_feature_alignment / 100))
