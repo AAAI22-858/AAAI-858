@@ -10,8 +10,7 @@ from pathlib import Path
 import warnings
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-# os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-#
+
 warnings.filterwarnings('ignore')
 mainpath = os.getcwd()
 pix2pixhd_dir = Path(mainpath + '/src/pix2pixHD/')
@@ -117,9 +116,6 @@ def main():
             gt_fearture = res_net(new_gt)
 
             ####
-
-
-
 
             loss_feature_alignment = opt_loss(gen_fearture, gt_fearture)
             print("epoch:%d,i:%d,loss_feature_alignment:%f"%(epoch,i,loss_feature_alignment / 100) )
