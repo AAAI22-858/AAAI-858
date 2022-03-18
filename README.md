@@ -21,7 +21,7 @@ Please create a folder ${DATASET_DIR} to store target video and source video.
 ## Inference
 `sh inference.sh`
 
-
+## video demo
 ![image](https://github.com/AAAI22-858/AAAI-858/blob/main/video.gif)
 
 
