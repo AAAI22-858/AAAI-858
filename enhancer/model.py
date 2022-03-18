@@ -83,21 +83,7 @@ class GlobalGenerator(nn.Module):
         return self.model(x)
 
 
-"""
-  Use CycleGAN's NLayerDiscriminator as a starting point...
-  https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/models/networks.py
 
-  The discriminator is fixed to process 64*64 input.
-  params:
-    @ n_layers: You can change this param to control the receptive field size
-        n_layers  output  receptive field size
-            4     13*13           34
-            5      5*5            70
-            6      1*1            256
-
-  P.S. This implementation doesn't use sigmoid, so it must be trained with
-  nn.BCEWithLogitLoss() instead of nn.BCELoss()!       
-"""
 
 
 class NLayerDiscriminator(nn.Module):
