@@ -1,8 +1,8 @@
 # IJCAI22-5256
 This repository is the official implementation of our paper: Copy Motion From One to Another: Fake Motion Video Generation.
-# Environment
+## Environment
 The code is developed using python 3.6.12, pytorch-1.4.0, and CUDA 10.0 on Ubuntu 18.04. For our experiments, we used 2 NVIDIA 2080Ti GPUs.
-# Installation
+## Installation
 1. Create a conda virtual environment and activate it
 ```
 conda create -n FakeMotion python=3.6.12
@@ -12,14 +12,15 @@ conda activate FakeMotion
 
 `pip install -r FakeMotion_requirements.txt`
 
-# Data preparation
+## Data preparation
 Please create a folder ${DATASET_DIR} to store target video and source video.
 
-# Training
+## Training
 `sh train.sh`
 
-# Inference
+## Inference
 `sh inference.sh`
+
 
 ![image](https://github.com/AAAI22-858/AAAI-858/blob/main/video.gif)
 
