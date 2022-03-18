@@ -12,5 +12,15 @@ conda activate FakeMotion
 
 `pip install -r FakeMotion_requirements.txt`
 
+# Data preparation
+Please create a folder ${DATASET_DIR} to store target video and source video.
+
+# Training
+`sh train.sh`
+
+# Inference
+`sh inference.sh`
 
 ![image](https://github.com/AAAI22-858/AAAI-858/blob/main/video.gif)
+
+
