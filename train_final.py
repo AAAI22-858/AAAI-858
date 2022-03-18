@@ -26,7 +26,9 @@ torch.backends.cudnn.benchmark = True
 
 opt.checkpoints_dir += 'final/'
 opt.target = 'final'
-
+def freeze_plane2(model):
+    for param in model.parameters():
+        param.requires_grad = False
 def main():
     iter_path = os.path.join(opt.checkpoints_dir, opt.name, 'iter.txt')
     data_loader = CreateDataLoader(opt)
@@ -34,7 +36,7 @@ def main():
     dataset_size = len(data_loader)
     print('#training images = %d' % dataset_size)
 
-    start_epoch, epoch_iter = 0, 0
+    start_epoch, epoch_iter = 1, 0
     total_steps = (start_epoch - 1) * dataset_size + epoch_iter
     display_delta = total_steps % opt.display_freq
     print_delta = total_steps % opt.print_freq
@@ -61,11 +63,31 @@ def main():
                                             Variable(data['image']), Variable(data['feat']), infer=save_fake,
                                             synbg=Variable(data['synbg']), synfg=Variable(data['synfg']))
 
+            
+            import torchvision
+            import optimal_transport_loss as ot
+            opt_loss = ot.FeatureOptimalLoss()
+            res_net = torchvision.models.resnet18(pretrained=True)
+            res_net.cuda()
+            freeze_plane2(res_net)
+            # new_gen = torch.nn.functional.interpolate(generated, size = (328, 328), mode='bilinear')
+            # new_gen = torch.nn.functional.interpolate(generated, scale_factor = 2, mode='bilinear')
+            # new_gt = torch.nn.functional.interpolate(data['image'], scale_factor = 2, mode='nearest')
+            # new_gt = torch.nn.functional.interpolate(data['gt_img'], size = (328, 328), mode='bilinear')
+            new_gen = generated.cuda()
+            new_gt = data['gt_img'].cuda()
+            gen_fearture = res_net(new_gen)
+            gt_fearture = res_net(new_gt)
+
+
+            loss_feature_alignment = opt_loss(gen_fearture, gt_fearture)
+            print("epoch:%d,i:%d,loss_feature_alignment:%f" % (epoch, i, loss_feature_alignment / 100))
+            ####
             losses = [torch.mean(x) if not isinstance(x, int) else x for x in losses]
             loss_dict = dict(zip(model_final.loss_names, losses))
 
             loss_D_final = (loss_dict['D_fake'] + loss_dict['D_real']) * 0.5
-            loss_G_final = loss_dict['G_GAN'] + loss_dict.get('G_GAN_Feat', 0) + loss_dict.get('G_VGG', 0)
+            loss_G_final = loss_dict['G_GAN'] + loss_dict.get('G_GAN_Feat', 0) +loss_feature_alignment *0.1
 
             model_final.optimizer_G.zero_grad()
             loss_G_final.backward()
