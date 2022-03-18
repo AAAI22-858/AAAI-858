@@ -3,9 +3,11 @@ import sys
 import time
 import numpy as np
 import torch
+import torchvision
 from torch import nn
 import torch.optim as optim
 from skimage.io import imsave
+import optimal_transport_loss as ot
 
 
 def freeze_plane2(model):
@@ -38,9 +40,8 @@ class Trainer(object):
         self.enumerator = None
 
         sys.path.append('../')
-        from enhancer.utils.perceptual_loss import VGG_perceptual_loss
-        self.gen_loss = nn.MSELoss()
-        self.recon_loss = VGG_perceptual_loss(pretrained=True, device=self.device)
+        opt_loss = ot.FeatureOptimalLoss()
+        self.gen_loss = opt_loss()
         self.dis_loss = nn.MSELoss()  # LSGAN
 
         np.random.seed(233)
@@ -86,29 +87,11 @@ class Trainer(object):
             real_features = d.extract_features(real_heads)
         gen_loss = self.gen_loss(fake_features, real_features)
 
-        recon_loss = self.recon_loss(enhanced_heads, real_heads)
-        # 20180924 change recon_loss weight
-        # 20180929 ablation study on recon_loss weight
-        ####
-        import optimal_transport_loss as ot
-        import torchvision
-        opt_loss = ot.FeatureOptimalLoss()
+
         res_net = torchvision.models.resnet18(pretrained=True)
         res_net.cuda()
         freeze_plane2(res_net)
-        conv = nn.Conv2d(256, 3, 3, 1, 1, )
-        conv.cuda()
-        fake_features = conv(fake_features)
-        real_features = conv(real_features)
-        new_fake_feature = fake_features.cuda()
-        new_real_feature = real_features.cuda()
-        new_fake_feature = res_net(new_fake_feature)
-        new_real_feature = res_net(new_real_feature)
-        ot_loss = opt_loss(new_fake_feature, new_real_feature)
-        ###
-        # print("gen_loss:%f,recon_loss:%f,ot_loss:%f"%(gen_loss,recon_loss*10,ot_loss/10000))
-        # ot_loss/=1000
-        gen_loss = gen_loss + 10 * recon_loss+ot_loss/10000
+        gen_loss *=0.1
         gen_loss_val = gen_loss.item()
         gen_loss.backward()
         g_opt.step()
