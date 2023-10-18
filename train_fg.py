@@ -10,7 +10,8 @@ from pathlib import Path
 import warnings
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
-
+# os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+#
 warnings.filterwarnings('ignore')
 mainpath = os.getcwd()
 pix2pixhd_dir = Path(mainpath + '/src/pix2pixHD/')
@@ -86,6 +87,7 @@ def main():
 
     for epoch in range(start_epoch, opt.niter + opt.niter_decay + 1):
         epoch_start_time = time.time()
+        random = 15
         if epoch != start_epoch:
             epoch_iter = epoch_iter % dataset_size
         for i, data in enumerate(dataset, start=epoch_iter):
@@ -117,6 +119,9 @@ def main():
 
             ####
 
+            # cri_mse = torch.nn.MSELoss()
+
+            # loss_feature_alignment = cri_mse(gen_fearture, gt_fearture)
             loss_feature_alignment = opt_loss(gen_fearture, gt_fearture)
             print("epoch:%d,i:%d,loss_feature_alignment:%f"%(epoch,i,loss_feature_alignment / 100) )
             ###
@@ -125,8 +130,8 @@ def main():
 
             loss_D_fg = (loss_dict['D_fake'] + loss_dict['D_real']) * 0.5
             loss_Dt_fg = (loss_dict['Dt_fake'] + loss_dict['Dt_real']) * 0.5
-            loss_G_fg = loss_dict['G_GAN'] + loss_dict.get('G_GAN_Feat', 0) + loss_dict[
-                'Dt_fake'] * 0.25 + loss_feature_alignment * 0.1
+            loss_G_fg = loss_dict['G_GAN'] + loss_dict.get('G_GAN_Feat', 0) + loss_dict.get('G_VGG', 0) + loss_dict[
+                'Dt_fake'] * 0.25 + loss_feature_alignment / 100
 
             model_fg.optimizer_G.zero_grad()
             loss_G_fg.backward(retain_graph=True)
@@ -137,6 +142,51 @@ def main():
             model_fg.optimizer_Dt.zero_grad()
             loss_Dt_fg.backward()
             model_fg.optimizer_Dt.step()
+
+            if i%random ==0 or loss_G_fg< threshold:
+                losses, generated = model_fg(Variable(data['label']), Variable(data['inst']), Variable(data['mask']),
+                                             Variable(data['image']), Variable(data['feat']), infer=True)
+                opt_loss = ot.FeatureOptimalLoss()
+                res_net = torchvision.models.resnet18(pretrained=True)
+                res_net.cuda()
+                freeze_plane2(res_net)
+                # new_gen = torch.nn.functional.interpolate(generated, size = (328, 328), mode='bilinear')
+                # new_gen = torch.nn.functional.interpolate(generated, scale_factor = 2, mode='bilinear')
+                # new_gt = torch.nn.functional.interpolate(data['image'], scale_factor = 2, mode='nearest')
+                # new_gt = torch.nn.functional.interpolate(data['gt_img'], size = (328, 328), mode='bilinear')
+                new_gen = generated.cuda()
+                new_gt = data['gt_img'].cuda()
+                gen_fearture = res_net(new_gen)
+                gt_fearture = res_net(new_gt)
+
+                ####
+
+                # cri_mse = torch.nn.MSELoss()
+
+                # loss_feature_alignment = cri_mse(gen_fearture, gt_fearture)
+                loss_feature_alignment = opt_loss(gen_fearture, gt_fearture)
+                print("epoch:%d,i:%d,loss_feature_alignment:%f" % (epoch, i, loss_feature_alignment / 100))
+                ###
+                losses = [torch.mean(x) if not isinstance(x, int) else x for x in losses]
+                loss_dict = dict(zip(model_fg.loss_names, losses))
+
+                loss_D_fg = (loss_dict['D_fake'] + loss_dict['D_real']) * 0.5
+                loss_Dt_fg = (loss_dict['Dt_fake'] + loss_dict['Dt_real']) * 0.5
+                loss_G_fg = loss_dict['G_GAN'] + loss_dict.get('G_GAN_Feat', 0) + loss_dict.get('G_VGG', 0) + loss_dict[
+                    'Dt_fake'] * 0.25 + loss_feature_alignment / 100
+
+                model_fg.optimizer_G.zero_grad()
+                loss_G_fg.backward(retain_graph=True)
+                model_fg.optimizer_G.step()
+                model_fg.optimizer_D.zero_grad()
+                loss_D_fg.backward()
+                model_fg.optimizer_D.step()
+                model_fg.optimizer_Dt.zero_grad()
+                loss_Dt_fg.backward()
+                model_fg.optimizer_Dt.step()
+
+
+
 
             ############## Display results and errors ##########
             ### print out errors
