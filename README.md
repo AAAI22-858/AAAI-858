@@ -1,5 +1,4 @@
-# IJCAI22-5256
-This repository is the official implementation of our paper: Copy Motion From One to Another: Fake Motion Video Generation.
+# TDSC
 ## Environment
 The code is developed using python 3.6.12, pytorch-1.4.0, and CUDA 10.0 on Ubuntu 18.04. For our experiments, we used a NVIDIA 2080Ti GPU.
 ## Installation
