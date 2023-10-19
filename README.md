@@ -24,8 +24,6 @@ Please create a folder ${DATASET_DIR} to store target video and source video.
 <img src="https://github.com/AAAI22-858/AAAI-858/blob/main/video.gif" width="450" height="300" alt="twodataset"/><br/>
 <img src="https://github.com/AAAI22-858/AAAI-858/blob/main/Fish.gif" width="450" height="300" alt="fish"/><br/>
 <img src="https://github.com/AAAI22-858/AAAI-858/blob/main/Mouse.gif" width="450" height="300" alt="mouse"/><br/>
-![image](https://github.com/AAAI22-858/AAAI-858/blob/main/video.gif)
-![image](https://github.com/AAAI22-858/AAAI-858/blob/main/Fish.gif)
-![image](https://github.com/AAAI22-858/AAAI-858/blob/main/Mouse.gif)
+
 
 
