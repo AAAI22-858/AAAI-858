@@ -21,7 +21,7 @@ Please create a folder ${DATASET_DIR} to store target video and source video.
 `sh inference.sh`
 
 ## video demo
-<img src="https://github.com/AAAI22-858/AAAI-858/blob/main/video.gif" width="600" height="400" alt="抖音小程序"/><br/>
+<img src="https://github.com/AAAI22-858/AAAI-858/blob/main/video.gif" width="550" height="400" alt="抖音小程序"/><br/>
 ![image](https://github.com/AAAI22-858/AAAI-858/blob/main/video.gif)
 ![image](https://github.com/AAAI22-858/AAAI-858/blob/main/Fish.gif)
 ![image](https://github.com/AAAI22-858/AAAI-858/blob/main/Mouse.gif)
