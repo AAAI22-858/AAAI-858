@@ -22,5 +22,7 @@ Please create a folder ${DATASET_DIR} to store target video and source video.
 
 ## video demo
 ![image](https://github.com/AAAI22-858/AAAI-858/blob/main/video.gif)
+![image](https://github.com/AAAI22-858/AAAI-858/blob/main/Fish.gif)
+![image](https://github.com/AAAI22-858/AAAI-858/blob/main/Mouse.gif)
 
 
